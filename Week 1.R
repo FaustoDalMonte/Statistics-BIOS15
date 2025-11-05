@@ -38,3 +38,6 @@ qnorm(c(0.025, 0.975))
 
 mean(x)- 1.96*se_x
 mean(x)+ 1.96*se_x
+
+
+nhfh f
