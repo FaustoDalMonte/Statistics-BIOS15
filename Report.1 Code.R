@@ -7,25 +7,42 @@ maple <- maple %>%
          !is.na(elevation),
          !is.na(stem_length),
          !is.na(stem_dry_mass)) %>%
-  mutate(
-    watershed = as.factor(watershed),
-    elevation = as.factor(elevation))
+  mutate(watershed = as.factor(watershed),
+         elevation = as.factor(elevation))
+
 
 ggplot(maple, aes(x = watershed, y = stem_length, colour = elevation)) +
+  theme_classic() +
   geom_boxplot(width = 0.5) +
-  labs(
-    x = "Watershed",
-    y = "Stem Length (mm)"
-  ) +
-  theme_classic()
+  scale_colour_manual(values = c("Low" = "Dark Orange 3", "Mid" = "Sea Green")) +
+  labs(x = "Watershed", y = "Stem Length (mm)", , colour = "Elevation") +
+  scale_x_discrete(labels = c("Untreated", "Treated")) +
+  scale_y_continuous(breaks = seq(0, max(maple$stem_length), by = 10)) +
+  theme(axis.text.x= element_text(color="gray20", size = 12),
+        axis.text.y= element_text(color="gray20", size = 9),
+        axis.line = element_line(colour = "gray20"),
+        axis.ticks = element_line(colour = "gray20"),
+        axis.title.x = element_text(colour = "gray14", size = 12),
+        axis.title.y = element_text(colour = "gray14", size = 12, margin = margin(r=10)),
+        legend.title = element_text(colour = "gray14", size = 11), 
+        legend.text = element_text(colour = "gray14", size = 9))
+
 
 ggplot(maple, aes(x = watershed, y = stem_dry_mass, colour = elevation)) +
-  geom_boxplot(width = 0.5) +
-  labs(
-    x = "Watershed",
-    y = "Stem Dry Mass (mg)"
-  ) +
-  theme_classic()
+  theme_classic() +
+  geom_boxplot(width=0.5) +
+  scale_colour_manual(values = c("Low" = "Dark Orange 3", "Mid" = "Sea Green")) +
+  labs(x = "Watershed", y = "Stem Dry Mass (mg)", colour = "Elevation") +
+  scale_x_discrete(labels = c("Untreated", "Treated"))+
+  scale_y_continuous(breaks = seq(0, max(maple$stem_dry_mass), by = 10)) +
+  theme(axis.text.x= element_text(color="gray20", size = 12),
+        axis.text.y= element_text(color="gray20", size = 9),
+        axis.line = element_line(colour = "gray20"),
+        axis.ticks = element_line(colour = "gray20"),
+        axis.title.x = element_text(colour = "gray14", size = 12),
+        axis.title.y = element_text(colour = "gray14", size = 12, margin = margin(r=10)),
+        legend.title = element_text(colour = "gray14", size = 11), 
+        legend.text = element_text(colour = "gray14", size = 9))
 
 
 table_summary <- maple %>%
@@ -37,6 +54,7 @@ table_summary <- maple %>%
     se_mass = 1000*sd(stem_dry_mass) / sqrt(n()),
     .groups = "drop"
   )
+
 watershed_summary <- maple %>%
   group_by(watershed) %>%
   summarise(
@@ -46,6 +64,7 @@ watershed_summary <- maple %>%
     se_mass = 1000*sd(stem_dry_mass) / sqrt(n()),
     .groups = "drop"
   )
+
 
 #Stem Length
 m<-lm(stem_length~elevation*watershed, data=maple)
