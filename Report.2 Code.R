@@ -61,7 +61,7 @@ summary(m7)
 m<-glm.nb(Eulaema_nigrita~forest.+Tseason+Pseason+effort, data=bee)
 summary(m)
 plot(m)
-coef<-coefs
+coefs<-coef(m)
 
 # y_hat = 3.6357552-1.3740454forest-0.0008547Tseason+0.0167939Pseason+0.3857495effort
 # y     = 37.93049+0.2530811forest+0.9991457Tseason+1.016936Pseason+1.470716effort
@@ -101,7 +101,7 @@ tidy_m <- tidy(m, conf.int = TRUE, conf.level = 0.95) # Alternative, different C
 confint(m) #Alternative for CIs, different CIs than custom made
 confint.default(m) #Also for the CIs, same as custom calculated, but higher rounding precision
 
-# Plot effect size back transformed
+# Plot effect sizes back transformed
 df$term <- as.factor(df$term)
 ggplot(df%>%
          filter(term!="(Intercept)")# %>%
@@ -153,7 +153,7 @@ lines(newdata$forest., newdata$y_upper, col = "black", lty = 2)
 # But if you also want confidence intervals, R does not automatically provide
 # the standard errors on the response scale, so they can be inaccurate.
 
-# Plotting effect of forest using the "averaging marginal effects" appraoch:
+# Plotting effect of forest using the "averaging marginal effects" approach:
 forest_seq <- seq(min(bee$forest.), max(bee$forest.), length.out = 100)
 marginal_preds <- numeric(length(forest_seq))
 marginal_lower <- numeric(length(forest_seq))
@@ -162,12 +162,9 @@ for (i in seq_along(forest_seq)) {
   f <- forest_seq[i]
   temp <- bee
   temp$forest. <- f
-  # Predict on link scale with SE
   pred <- predict(m, newdata = temp, type = "link", se.fit = TRUE)
-  # Compute CI for each row and average on response scale
   link_lower <- pred$fit - 1.96 * pred$se.fit
   link_upper <- pred$fit + 1.96 * pred$se.fit
-  # Convert to response scale
   marginal_preds[i] <- mean(exp(pred$fit))
   marginal_lower[i] <- mean(exp(link_lower))
   marginal_upper[i] <- mean(exp(link_upper))
